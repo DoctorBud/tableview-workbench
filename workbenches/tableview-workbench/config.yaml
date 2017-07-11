@@ -1,0 +1,7 @@
+menu-name: "Table Mode"
+page-name: "Table Mode"
+type: "model"
+help-link: "http://github.com/geneontology/noctua/issues"
+javascript:
+  - bundle.js
+css: []

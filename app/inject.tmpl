@@ -1,0 +1,313 @@
+<!-- {{=<% %>=}} -->
+
+<!-- Main "app". -->
+<div
+  ng-strict-di
+  ng-app="TVApp">
+
+  <div
+    ng-controller="TVController as tvc"
+    class="container-fluid">
+    <div class="header text-center">
+      <h4>{{tvc.title[0].value()}} ({{tvc.model_id}})</h4>
+    </div>
+
+    <div class="row">
+      <div class="col-xs-12">
+        <div class="input-group input-group-sm">
+          <span class="input-group-addon" id="igGP">GP</span>
+          <div class="typeaheadcontainer">
+            <div
+              style="position:absolute;z-index:100;margin-left:4px;"
+              ng-show="loadingItemsGP">
+              <i class="fa fa-spinner fa-spin fa-fw"></i>
+            </div>
+            <input
+              aria-describedby="igGP"
+              type="text"
+              ng-model="tvc.editingModel.GP"
+              ng-trim="true"
+              uib-typeahead="term as term.label for term in tvc.getTerm('GP', $viewValue)"
+              typeahead-append-to-body="true"
+              xtypeahead-focus-on-select="true"
+              xtypeahead-select-on-blur="false"
+              typeahead-loading="loadingItemsGP"
+              typeahead-no-results="noResultsGP"
+              typeahead-template-url="customTemplate.html"
+              typeahead-editable="true"
+              typeahead-min-length=0
+              xtypeahead-is-open="isOpen"
+              typeahead-is-open="'true'"
+              typeahead-on-select="tvc.termSelected('GP', $item, $model, $label, $event)"
+              class="typeaheadcontrol form-control"
+              ng-class="isOpen ? 'typeahead-is-open' : 'typeahead-is-closed'">
+            </input>
+            <div class="no-results"
+              ng-show="noResultsGP">
+              No Results Found
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-xs-3">
+        <div class="input-group input-group-sm">
+          <span class="input-group-addon" id="igMF">MF</span>
+
+          <div class="typeaheadcontainer">
+            <div
+              style="position:absolute;z-index:100;margin-left:4px;"
+              ng-show="loadingItemsMF">
+              <i class="fa fa-spinner fa-spin fa-fw"></i>
+            </div>
+            <input
+              aria-describedby="igMF"
+              type="text"
+              ng-model="tvc.editingModel.MF"
+              ng-trim="true"
+              uib-typeahead="term as term.label for term in tvc.getTerm('MF', $viewValue)"
+              typeahead-append-to-body="true"
+              xtypeahead-focus-on-select="true"
+              xtypeahead-select-on-blur="false"
+              typeahead-loading="loadingItemsMF"
+              typeahead-no-results="noResultsMF"
+              typeahead-template-url="customTemplate.html"
+              typeahead-editable="true"
+              typeahead-min-length=0
+              xtypeahead-is-open="isOpen"
+              typeahead-is-open="'true'"
+              typeahead-on-select="tvc.termSelected('MF', $item, $model, $label, $event)"
+              class="typeaheadcontrol form-control"
+              ng-class="isOpen ? 'typeahead-is-open' : 'typeahead-is-closed'">
+            </input>
+            <div class="no-results"
+              ng-show="noResultsMF">
+              No Results Found
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <div class="col-xs-3">
+        <div class="input-group input-group-sm">
+          <span class="input-group-addon" id="igMFeCode">Evidence</span>
+
+          <div class="typeaheadcontainer">
+            <div
+              style="position:absolute;z-index:100;margin-left:4px;"
+              ng-show="loadingItemsMFe">
+              <i class="fa fa-spinner fa-spin fa-fw"></i>
+            </div>
+            <input
+              aria-describedby="igMFe"
+              type="text"
+              ng-model="tvc.editingModel.MFe"
+              ng-trim="true"
+              uib-typeahead="term as term.label for term in tvc.getTerm('MFe', $viewValue)"
+              typeahead-append-to-body="true"
+              xtypeahead-focus-on-select="true"
+              xtypeahead-select-on-blur="false"
+              typeahead-loading="loadingItemsMFe"
+              typeahead-no-results="noResultsMFe"
+              typeahead-template-url="customTemplate.html"
+              typeahead-editable="true"
+              typeahead-min-length=0
+              xtypeahead-is-open="isOpen"
+              typeahead-is-open="'true'"
+              typeahead-on-select="tvc.termSelected('MFe', $item, $model, $label, $event)"
+              class="typeaheadcontrol form-control"
+              ng-class="isOpen ? 'typeahead-is-open' : 'typeahead-is-closed'">
+            </input>
+            <div class="no-results"
+              ng-show="noResultsMFe">
+              No Results Found
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <div class="col-xs-3">
+        <div class="input-group input-group-sm">
+          <span class="input-group-addon" id="igMFeReference">Reference</span>
+          <input
+            ng-model="tvc.editingModel.MFe.reference"
+            type="text"
+            class="form-control"
+            placeholder="PMID:1234"
+            aria-describedby="igMFeReference">
+        </div>
+      </div>
+
+      <div class="col-xs-3">
+        <div class="input-group input-group-sm">
+          <span class="input-group-addon" id="igMFeWith">With</span>
+          <input
+            ng-model="tvc.editingModel.MFe.with"
+            type="text"
+            class="form-control"
+            placeholder="PMID:5678"
+            aria-describedby="igMFeWith">
+        </div>
+      </div>
+
+    </div>
+
+
+    <div class="row">
+      <div class="col-xs-3">
+        <div class="input-group input-group-sm">
+          <span class="input-group-addon" id="igBP">BP</span>
+          <input type="text" class="form-control" placeholder="BP" aria-describedby="igBP">
+        </div>
+      </div>
+
+      <div class="col-xs-3">
+        <div class="input-group input-group-sm">
+          <span class="input-group-addon" id="igBPeCode">Evidence</span>
+          <input type="text" class="form-control" placeholder="Evidence" aria-describedby="igBPeCode">
+        </div>
+      </div>
+
+      <div class="col-xs-3">
+        <div class="input-group input-group-sm">
+          <span class="input-group-addon" id="igBPeReference">Reference</span>
+          <input type="text" class="form-control" placeholder="PMID:1234" aria-describedby="igBPeReference">
+        </div>
+      </div>
+
+      <div class="col-xs-3">
+        <div class="input-group input-group-sm">
+          <span class="input-group-addon" id="igBPeWith">With</span>
+          <input type="text" class="form-control" placeholder="PMID:5678" aria-describedby="igBPeWith">
+        </div>
+      </div>
+
+    </div>
+
+
+    <div class="row">
+      <div class="col-xs-3">
+        <div class="input-group input-group-sm">
+          <span class="input-group-addon" id="igCC">CC</span>
+          <input type="text" class="form-control" placeholder="CC" aria-describedby="igCC">
+        </div>
+      </div>
+
+      <div class="col-xs-3">
+        <div class="input-group input-group-sm">
+          <span class="input-group-addon" id="igCCeCode">Evidence</span>
+          <input type="text" class="form-control" placeholder="Evidence" aria-describedby="igCCeCode">
+        </div>
+      </div>
+
+      <div class="col-xs-3">
+        <div class="input-group input-group-sm">
+          <span class="input-group-addon" id="igCCeReference">Reference</span>
+          <input type="text" class="form-control" placeholder="PMID:1234" aria-describedby="igCCeReference">
+        </div>
+      </div>
+
+      <div class="col-xs-3">
+        <div class="input-group input-group-sm">
+          <span class="input-group-addon" id="igCCeWith">With</span>
+          <input type="text" class="form-control" placeholder="PMID:5678" aria-describedby="igCCeWith">
+        </div>
+      </div>
+
+    </div>
+
+    <br>
+
+    <div
+      class="row">
+      <div class="col-xs-12">
+        <button
+          type="button"
+          ng-disabled="!tvc.saveRowEnabled()"
+          ng-click="tvc.saveRow()"
+          class="btn btn-primary center-block xbtn-block">
+          Save Row
+        </button>
+      </div>
+    </div>
+
+    <br>
+
+    <div
+      class="row">
+      <div class="col-xs-12">
+        <div
+          id="grid1"
+          ui-grid="tvc.gridOptions"
+          ui-grid-edit
+          ui-grid-cellNav
+          ui-grid-resize-columns
+          ui-grid-auto-resize
+          ui-grid-tree-view
+          class="grid"
+          style="margin:0;padding:0;height:300px;width:100%;">
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script type="text/ng-template" id="uigridActionHeader">
+<!--     <button
+      type="button"
+      title="Add Association"
+      class="btn btn-primary btn-xs xbtn-compact"
+      xng-click="grid.appScope.tvc.addRow()">
+      <i class="fa fa-plus fa-fw"></i>
+    </button>
+ -->
+  </script>
+
+  <script type="text/ng-template" id="uigridActionCell">
+    <div
+      class="ui-grid-cell-contents"
+      title="TOOLTIP">
+      <div
+        ng-if="row.treeLevel === 0"
+        class="text-center action-row">
+        <button
+          type="button"
+          title="Edit Annoton"
+          class="btn btn-default btn-xs btn-compact"
+          ng-click="grid.appScope.tvc.editRow(row.entity)">
+          <i class="fa fa-pencil fa-fw"></i>
+        </button>
+      </div>
+      <div
+        ng-if="row.treeLevel === 0"
+        class="text-center action-row">
+        <button
+          type="button"
+          title="Delete Annoton"
+          class="btn btn-default btn-xs btn-compact"
+          ng-click="grid.appScope.tvc.deleteRow(row.entity)">
+          <i class="fa fa-trash-o fa-fw"></i>
+        </button>
+      </div>
+    </div>
+  </script>
+
+  <script type="text/ng-template" id="customTemplate.html">
+    <a>
+
+  <!--       <span style="display:inline-block;min-width:320px;width:320px;font-size:0.7em;font-style:bold;" ng-bind-html="match.model | json"></span>
+  -->
+      <span style="display:inline-block;width:150px;font-size:0.9em;font-style:italic;" ng-bind-html="match.model.id | uibTypeaheadHighlight:query"></span>
+      <span ng-bind-html="match.model.label | uibTypeaheadHighlight:query"></span>
+    </a>
+  </script>
+
+
+</div>
+
+
+<!-- <%={{ }}=%> -->
+
