@@ -43,6 +43,9 @@ export default class TVController {
     tvc.$timeout = $timeout;
     tvc.lookup = lookup;
 
+    var userNameInfo = document.getElementById('user_name_info');
+    userNameInfo.innerHTML = '';
+
     tvc.model_id = local_id;
     tvc.golr_server = local_golr_server;
     tvc.barista_location = local_barista_location;
@@ -279,6 +282,34 @@ export default class TVController {
     // console.log('termSelected', field, this.editingModel[field], term);
   }
 
+
+  fillModelWithFakeData() {
+    console.log('fillModelWithFakeData', this.editingModel);
+    this.editingModel = {
+      GP: {id: 'CHEBI:84155', label: 'lauryl palmitoleate'},
+      MF: {id: 'GO:0045551', label: 'cinnamyl-alcohol dehydrogenase activity'},
+      MFe: {
+        id: 'ECO:0006017',
+        label: 'traceable author statement from published clinical study used in manual assertion',
+        reference: 'PMID:1234',
+        with: 'PMID:5678'},
+
+      BP: {id: 'GO:0046577', label: 'long-chain-alcohol oxidase activity'},
+      BPe: {
+        id: 'ECO:0000501',
+        label: 'evidence used in automatic assertion',
+        reference: 'r2',
+        with: 'w2'},
+
+      CC: {id: 'GO:0047639', label: 'alcohol oxidase activity'},
+      CCe: {
+        id: 'ECO:0005542',
+        label: 'biological system reconstruction evidence by exper…ence from single species used in manual assertion',
+        reference: 'r3',
+        with: 'w3'}
+    };
+  }
+
   clearForm() {
     this.editingModel = {
       GP: null,
@@ -301,23 +332,9 @@ export default class TVController {
   saveRow() {
     console.log('saveRow', this.editingModel);
 
-    let oldData = this.gridOptions.data;
-    let annoton = {
-      GP: this.editingModel.GP.id,
+    let annotonRows = GraphModel.editingModelToTableRows(this.graph, this.editingModel);
 
-      MF: this.editingModel.MF ? this.editingModel.MF.id : null,
-      MFe: this.editingModel.MFe ? this.editingModel.MFe : null,
-
-      BP: this.editingModel.BP ? this.editingModel.BP.id : null,
-      BPe: this.editingModel.BPe ? this.editingModel.BPe : null,
-
-      CC: this.editingModel.CC ? this.editingModel.CC.id : null,
-      CCe: this.editingModel.CCe ? this.editingModel.CCe : null
-    };
-
-    let annotonRows = GraphModel.annotonxToTableRows(this.graph, this.editingModel);
-
-    console.log('annotonRows', annotonRows);
+    // console.log('annotonRows', annotonRows);
     this.gridOptions.data = this.gridOptions.data.concat(annotonRows);
 
     this.clearForm();

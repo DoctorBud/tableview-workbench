@@ -1,5 +1,5 @@
-menu-name: "Table Mode"
-page-name: "Table Mode"
+menu-name: "Table View"
+page-name: "Table View"
 type: "model"
 help-link: "http://github.com/geneontology/noctua/issues"
 javascript:

@@ -71,18 +71,22 @@ function edgeToEvidence(graph, edge) {
     var firstAnnotationId = evidenceAnnotations[0].value();
     var firstAnnotationNode = graph.get_node(firstAnnotationId);
     if (firstAnnotationNode) {
-      console.log('...firstAnnotationId', firstAnnotationId);
-      console.log('...firstAnnotationNode', firstAnnotationNode);
+      // console.log('...firstAnnotationId', firstAnnotationId);
+      // console.log('...firstAnnotationNode', firstAnnotationNode);
       result.evidence.id = getNodeId(firstAnnotationNode);
       result.evidence.label = getNodeLabel(firstAnnotationNode);
-      console.log('...firstAnnotationNode result.evidence', result.evidence);
+      // console.log('...firstAnnotationNode result.evidence', result.evidence);
 
       let sources = firstAnnotationNode.get_annotations_by_key('source');
       let withs = firstAnnotationNode.get_annotations_by_key('with');
       // console.log('...sources', sources);
       // console.log('...withs', withs);
-      result.reference = sources[0].value();
-      result.with = withs[0].value();
+      if (sources.length > 0) {
+        result.reference = sources[0].value();
+      }
+      if (withs.length > 0) {
+        result.with = withs[0].value();
+      }
       // console.log('...evidenceLabel', edge, firstAnnotationId, firstAnnotationNode);
     }
   }
@@ -100,6 +104,7 @@ function graphToAnnotons(graph) {
   var annotons = [];
 
   each(graph.all_edges(), function(e) {
+    // console.log('e', e, e.predicate_id(), idToPredicateLabel(e.predicate_id()));
     if (e.predicate_id() === PredicateEnabledBy) {
       let mfId = e.subject_id();
       let gpId = e.object_id();
@@ -119,8 +124,8 @@ function graphToAnnotons(graph) {
         let predicateId = toMFEdge.predicate_id();
         let predicateLabel = idToPredicateLabel(e.predicate_id());
         let evidence = edgeToEvidence(graph, toMFEdge);
-
         let toMFObject = toMFEdge.object_id();
+
         if (predicateId === PredicateEnabledBy) {
           // console.log('......PredicateEnabledBy GP', toMFObject);
           annoton.GP = toMFObject;
@@ -204,12 +209,13 @@ function annotonToTableRows(graph, annoton) {
     });
   }
 
-  console.log('annotonToTableRows', annoton, result);
+  // console.log('annotonToTableRows', annoton, result);
 
   return result;
 }
 
-function annotonxToTableRows(graph, annoton) {
+function editingModelToTableRows(graph, annoton) {
+  // console.log('editingModelToTableRows', annoton);
   let result = [];
 
   let gpLabel = annoton.GP.label;
@@ -259,7 +265,7 @@ function annotonxToTableRows(graph, annoton) {
     });
   }
 
-  console.log('annotonxToTableRows', annoton, result);
+  // console.log('editingModelToTableRows', annoton, result);
 
   return result;
 }
@@ -279,7 +285,7 @@ function annotonsToTable(graph, annotons) {
 module.exports = {
   graphToAnnotons: graphToAnnotons,
   annotonToTableRows: annotonToTableRows,
-  annotonxToTableRows: annotonxToTableRows,
+  editingModelToTableRows: editingModelToTableRows,
   annotonsToTable: annotonsToTable,
   getNodeLabel: getNodeLabel,
   idToPredicateLabel: idToPredicateLabel,

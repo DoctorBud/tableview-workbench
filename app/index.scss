@@ -45,3 +45,17 @@ div.typeaheadcontainer div.no-results {
   padding:1px;
 }
 
+
+/* shouldn't have to do this, but the Noctua-injected Bootstrap
+styles aren't behaving properly, and because they don't go through the SCSS processor,
+I need to explicitly tweak the classes. There has to be a better way.
+*/
+
+.navbar {
+  height: 50px;
+}
+
+
+.navbar .nav.navbar-nav {
+  margin:5px 0 0 0;
+}
