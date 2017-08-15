@@ -5,9 +5,10 @@ A Noctua Workbench to allow entry and viewing of models in a tabular format
 ### Known Issues
 
 - The workbench fails to load properly when the user is not logged into Noctua.
-- Summary rows for the Annoton *groups* need to display more information.
-- Save does not work yet.
 - Changes to the model from within Noctua's graph editor are not reflected dynamically in the table view.
+- Edit Annoton does not work yet
+- Delete Annoton does not work yet
+
 
 ### How to Build
 

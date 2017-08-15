@@ -59,3 +59,15 @@ I need to explicitly tweak the classes. There has to be a better way.
 .navbar .nav.navbar-nav {
   margin:5px 0 0 0;
 }
+
+.tv-container .input-group-addon {
+  height: 30px;
+  min-width:35px;
+  padding:0 2px;
+  margin: 0;
+}
+
+.tv-container .ui-grid-row-summary .ui-grid-cell-contents {
+  font-size: 0.9em;
+}
+
