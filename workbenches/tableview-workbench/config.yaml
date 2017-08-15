@@ -1,5 +1,5 @@
-menu-name: "Table View"
-page-name: "Table View"
+menu-name: "Simple Annoton Editor"
+page-name: "Simple Annoton Editor"
 type: "model"
 help-link: "http://github.com/geneontology/noctua/issues"
 javascript:

@@ -7,7 +7,7 @@
 
   <div
     ng-controller="TVController as tvc"
-    class="container-fluid">
+    class="container-fluid tv-container">
 
     <br>
     <div
@@ -40,6 +40,7 @@
               type="text"
               ng-model="tvc.editingModel.GP"
               ng-trim="true"
+              ng-blur="noResultsGP = false"
               uib-typeahead="term as term.label for term in tvc.getTerm('GP', $viewValue)"
               typeahead-append-to-body="true"
               xtypeahead-focus-on-select="true"
@@ -56,7 +57,7 @@
               ng-class="isOpen ? 'typeahead-is-open' : 'typeahead-is-closed'">
             </input>
             <div class="no-results"
-              ng-show="noResultsGP">
+              ng-show="tvc.editingModel.GP.length > 2 && noResultsGP">
               No Results Found
             </div>
           </div>
@@ -81,6 +82,7 @@
               type="text"
               ng-model="tvc.editingModel[term]"
               ng-trim="true"
+              ng-blur="noResults[term] = false"
               uib-typeahead="term as term.label for term in tvc.getTerm(term, $viewValue)"
               typeahead-append-to-body="true"
               xtypeahead-focus-on-select="true"
@@ -97,7 +99,7 @@
               ng-class="isOpen ? 'typeahead-is-open' : 'typeahead-is-closed'">
             </input>
             <div class="no-results"
-              ng-show="noResults[term]">
+              ng-show="tvc.editingModel[term].length > 2 && noResults[term]">
               No Results Found
             </div>
           </div>
@@ -120,6 +122,7 @@
               type="text"
               ng-model="tvc.editingModel[term + 'e']"
               ng-trim="true"
+              ng-blur="noResults[term + 'e'] = false"
               uib-typeahead="term as term.label for term in tvc.getTerm(term + 'e', $viewValue)"
               typeahead-append-to-body="true"
               xtypeahead-focus-on-select="true"
@@ -136,7 +139,7 @@
               ng-class="isOpen ? 'typeahead-is-open' : 'typeahead-is-closed'">
             </input>
             <div class="no-results"
-              ng-show="noResults[term + 'e']">
+              ng-show="tvc.editingModel[term + 'e'].length > 2 && noResults[term + 'e']">
               No Results Found
             </div>
           </div>
@@ -170,13 +173,13 @@
 
     </div>
 
-
     <div
-      class="row">
+      class="row"
+      style="margin-top:10px;">
       <div class="col-xs-12">
         <button
           type="button"
-          xng-disabled="!tvc.saveRowEnabled()"
+          ng-disabled="!tvc.saveRowEnabled()"
           ng-click="tvc.saveRow()"
           class="btn btn-primary btn-sm center-block xbtn-block">
           Save Annoton
@@ -198,7 +201,7 @@
           ui-grid-auto-resize
           ui-grid-tree-view
           class="grid"
-          style="margin:0;padding:0;height:300px;width:100%;">
+          style="margin:0;padding:0;height:80%;width:100%;">
         </div>
       </div>
     </div>
@@ -254,7 +257,23 @@
     </a>
   </script>
 
+  <script type="text/ng-template" id="rowTemplate.html">
+     <div
+      ng-repeat="(colRenderIndex, col) in colContainer.renderedColumns track by col.uid"
+      ui-grid-one-bind-id-grid="rowRenderIndex + '-' + col.uid + '-cell'"
+      class="ui-grid-cell"
+      ng-class="{'ui-grid-row-header-cell': col.isRowHeader, 'ui-grid-row-summary': row.treeLevel === 0 }"
+      role="{{col.isRowHeader ? 'rowheader' : 'gridcell'}}"
+      ui-grid-cell>
+    </div>
+  </script>
 
+  <script type="text/ng-template" id="cellTemplate.html">
+    <div
+      style="white-space:pre-line !important;"
+      class="ui-grid-cell-contents"
+      title="TOOLTIP">{{COL_FIELD CUSTOM_FILTERS}}</div>
+  </script>
 </div>
 
 

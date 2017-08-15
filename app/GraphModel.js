@@ -15,7 +15,7 @@ function getNodeLabel(node) {
   if (node) {
     each(node.types(), function(in_type) {
       label += in_type._class_label +
-                '\n(' + in_type._class_id + ')';
+                ' (' + in_type._class_id + ')';
     });
   }
 
@@ -107,7 +107,6 @@ function graphToAnnotons(graph) {
     // console.log('e', e, e.predicate_id(), idToPredicateLabel(e.predicate_id()));
     if (e.predicate_id() === PredicateEnabledBy) {
       let mfId = e.subject_id();
-      let gpId = e.object_id();
 
       let annoton = {
         GP: null,
@@ -167,15 +166,12 @@ function annotonToTableRows(graph, annoton) {
   let cc = graph.get_node(annoton.CC);
   let ccLabel = getNodeLabel(cc);
 
-  result.push({
-      Aspect: 'FPC',
-      GP: gpLabel,
-      Term: 'TERM',
-      Evidence: 'EVIDENCE',
-      Reference: 'REFERENCE',
-      With: 'WITH',
-      $$treeLevel: 0
-  });
+  let summaryAspect = '';
+  let summaryTerm = '';
+  let summaryEvidence = '';
+  let summaryReference = '';
+  let summaryWith = '';
+
   result.push({
       Aspect: 'F',
       // GP: gpLabel,
@@ -185,16 +181,34 @@ function annotonToTableRows(graph, annoton) {
       With: annoton.MFe.with,
       $$treeLevel: 1
   });
+
+  summaryAspect += 'F';
+  summaryTerm += '• ' + mfLabel;
+
+  if (annoton.MFe.evidence.id) {
+    summaryEvidence += '• ' + annoton.MFe.evidence.label;
+    summaryReference += '• ' + annoton.MFe.reference;
+    summaryWith += '• ' + annoton.MFe.with;
+  }
+
   if (bp) {
     result.push({
         Aspect: 'P',
         // GP: gpLabel,
         Term: bpLabel,
-        Evidence: annoton.BPe.evidence,
+        Evidence: annoton.BPe.evidence.label,
         Reference: annoton.BPe.reference,
         With: annoton.BPe.with,
         $$treeLevel: 1
     });
+
+    summaryAspect += 'P';
+    summaryTerm += '\n• ' + bpLabel;
+    if (annoton.BPe.evidence.id) {
+      summaryEvidence += '\n• ' + annoton.BPe.evidence.label;
+      summaryReference += '\n• ' + annoton.BPe.reference;
+      summaryWith += '\n• ' + annoton.BPe.with;
+    }
   }
 
   if (cc) {
@@ -207,7 +221,27 @@ function annotonToTableRows(graph, annoton) {
         With: annoton.CCe.with,
         $$treeLevel: 1
     });
+
+    summaryAspect += 'C';
+    summaryTerm += '\n• ' + ccLabel;
+    if (annoton.CCe.evidence.id) {
+      summaryEvidence += '\n• ' + annoton.CCe.evidence.label;
+      summaryReference += '\n• ' + annoton.CCe.reference;
+      summaryWith += '\n• ' + annoton.CCe.with;
+    }
   }
+
+  result.unshift({
+      Aspect: summaryAspect,
+      GP: gpLabel,
+      Term: summaryTerm,
+      Evidence: {
+        label: summaryEvidence
+      },
+      Reference: summaryReference,
+      With: summaryWith,
+      $$treeLevel: 0
+  });
 
   // console.log('annotonToTableRows', annoton, result);
 
