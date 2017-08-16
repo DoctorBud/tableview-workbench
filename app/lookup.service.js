@@ -11,7 +11,8 @@ export default class LookupService {
   }
 
   golrLookup(field, oldValue, val) {
-    var golrURLBase = 'http://amigo-dev-golr.berkeleybop.org/select';
+    /* global global_golr_server */
+    var golrURLBase = `${global_golr_server}/select`;
 
     var baseRequestParams = {
       defType: 'edismax',
@@ -31,18 +32,16 @@ export default class LookupService {
       _: Date.now()
     };
 
-    var requestParamsGP1 = Object.assign({}, baseRequestParams, {
-      q: val + '*',
-      'facet.field': 'category',
-      fq: 'document_category:"general"',
-      qf: [
-        'entity^3',
-        'entity_label_searchable^3',
-        'general_blob_searchable^3'
-      ],
-    });
-
-
+    // var requestParamsGP1 = Object.assign({}, baseRequestParams, {
+    //   q: val + '*',
+    //   'facet.field': 'category',
+    //   fq: 'document_category:"general"',
+    //   qf: [
+    //     'entity^3',
+    //     'entity_label_searchable^3',
+    //     'general_blob_searchable^3'
+    //   ],
+    // });
 
     var requestParamsGP = Object.assign({}, baseRequestParams, {
       q: val + '*',

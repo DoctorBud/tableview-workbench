@@ -43,7 +43,7 @@
               aria-describedby="igGP"
               type="text"
               ng-model="tvc.editingModel.GP"
-              ng-trim="true"
+              ng-trim="false"
               ng-blur="noResultsGP = false"
               uib-typeahead="term as term.label for term in tvc.getTerm('GP', $viewValue)"
               typeahead-append-to-body="true"
@@ -86,7 +86,7 @@
               aria-describedby="ig{{term}}"
               type="text"
               ng-model="tvc.editingModel[term]"
-              ng-trim="true"
+              ng-trim="false"
               ng-blur="noResults[term] = false"
               uib-typeahead="term as term.label for term in tvc.getTerm(term, $viewValue)"
               typeahead-append-to-body="true"
@@ -127,7 +127,7 @@
               aria-describedby="ig{{term}}e"
               type="text"
               ng-model="tvc.editingModel[term + 'e']"
-              ng-trim="true"
+              ng-trim="false"
               ng-blur="noResults[term + 'e'] = false"
               uib-typeahead="term as term.label for term in tvc.getTerm(term + 'e', $viewValue)"
               typeahead-append-to-body="true"
@@ -256,10 +256,7 @@
 
   <script type="text/ng-template" id="customTemplate.html">
     <a>
-
-  <!--       <span style="display:inline-block;min-width:320px;width:320px;font-size:0.7em;font-style:bold;" ng-bind-html="match.model | json"></span>
-  -->
-      <span style="display:inline-block;width:150px;font-size:0.9em;font-style:italic;" ng-bind-html="match.model.id | uibTypeaheadHighlight:query"></span>
+      <span style="display:inline-block;width:200px;font-size:0.9em;font-style:italic;" ng-bind-html="match.model.id | uibTypeaheadHighlight:query"></span>
       <span ng-bind-html="match.model.label | uibTypeaheadHighlight:query"></span>
     </a>
   </script>
