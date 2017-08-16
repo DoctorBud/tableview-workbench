@@ -3,73 +3,19 @@
 //  Primary controller driving the table-mode
 //
 
-// const each = require('lodash/forEach');
-// import Lookup from './lookup';
-
-
-// Noctua-specific
-var model = require('bbop-graph-noctua');
-var barista_response = require('bbop-response-barista');
-// var bbop = require('bbop-core');
-var minerva_requests = require('minerva-requests');
-// var barista_client = require('bbop-client-barista');
-var jquery_engine = require('bbop-rest-manager').jquery;
-var minerva_manager = require('bbop-manager-minerva');
-
-
-//
-//  Globals passed to Workbench from Noctua
-/* global global_id */
-/* global global_golr_server */
-/* global global_barista_location */
-/* global global_minerva_definition_name */
-/* global global_barista_token */
-/* global global_collapsible_relations */
-var local_id = typeof global_id !== 'undefined' ? global_id : 'global_id';
-var local_golr_server = typeof global_golr_server !== 'undefined' ? global_golr_server : 'global_id';
-var local_barista_location = typeof global_barista_location !== 'undefined' ? global_barista_location : 'global_barista_location';
-var local_minerva_definition_name = typeof global_minerva_definition_name !== 'undefined' ? global_minerva_definition_name : 'global_minerva_definition_name';
-var local_barista_token = typeof global_barista_token !== 'undefined' ? global_barista_token : 'global_barista_token';
-var local_collapsible_relations = typeof global_collapsible_relations !== 'undefined' ? global_collapsible_relations : 'global_collapsible_relations';
-
-const GraphModel = require('GraphModel.js');
-
-
-
-const PredicateEnabledBy = 'RO:0002333';
-const PredicatePartOf = 'BFO:0000050';
-const PredicateOccursIn = 'BFO:0000066';
-const annotationTitleKey = 'title';
-
 
 export default class TVController {
-  constructor($scope, $http, $timeout, uiGridTreeViewConstants, lookup) {
-
+  constructor($scope, $rootScope, $http, $timeout, uiGridTreeViewConstants, graph, lookup) {
     var tvc = this;
     this.$scope = $scope;
+    this.$rootScope = $rootScope;
     this.uiGridTreeViewConstants = uiGridTreeViewConstants;
     tvc.$timeout = $timeout;
     tvc.lookup = lookup;
+    tvc.graph = graph;
 
     var userNameInfo = document.getElementById('user_name_info');
     userNameInfo.innerHTML = '';
-
-    tvc.model_id = local_id;
-    tvc.golr_server = local_golr_server;
-    tvc.barista_location = local_barista_location;
-    tvc.minerva_definition_name = local_minerva_definition_name;
-    tvc.barista_token = local_barista_token;
-    tvc.collapsible_relations = local_collapsible_relations;
-
-    //delete? tvc.fieldToRoot = {
-    //delete?   GP: null,
-    //delete?   MF: null,
-    //delete?   MFe: null,
-    //delete?   BP: null,
-    //delete?   BPe: null,
-    //delete?   CC: null,
-    //delete?   CCe: null
-    //delete? };
 
     tvc.clearForm();
 
@@ -89,20 +35,6 @@ export default class TVController {
     };
 
     let columnDefs = [];
-    // columnDefs.push({
-    //     name: 'Command',
-    //     field: '',
-    //     originalName: 'Command',
-    //     displayName: '',
-    //     width: 230,
-    //     enableCellSelection: false,
-    //     enableCellEditOnFocus: false,
-    //     enableSorting: false,
-    //     allowCellFocus: false,
-    //     enableHiding: false,
-    //     enableColumnMenu: false,
-    //   });
-
 
     let commandColumn = {
       name: 'Command',
@@ -196,97 +128,14 @@ export default class TVController {
       }, 0);
     };
 
-    tvc.graph = null;
+    $rootScope.$on('rebuilt', function(event, data) {
+      const gridData = data.gridData;
+      tvc.clearForm();
 
-    tvc.engine = new jquery_engine(barista_response);
-    tvc.engine.method('POST');
-    var manager = new minerva_manager(tvc.barista_location,
-                                      tvc.minerva_definition_name,
-                                      tvc.barista_token,
-                                      tvc.engine, 'async');
-
-    tvc.manager = manager;
-    function _shields_up(){
-      // console.log('_shields_up');
-    }
-    function _shields_down(){
-      // console.log('_shields_down');
-    }
-
-    // Internal registrations.
-    manager.register('prerun', _shields_up);
-    manager.register('postrun', _shields_down, 9);
-    manager.register('manager_error', function(resp /*, man */){
-      console.log('There was a manager error (' +
-        resp.message_type() + '): ' + resp.message());
-      }, 10);
-
-    // Likely the result of unhappiness on Minerva.
-    manager.register('warning', function(resp /*, man */){
-      alert('Warning: ' + resp.message() + '; ' +
-        'your operation was likely not performed');
-    }, 10);
-
-    // Likely the result of serious unhappiness on Minerva.
-    manager.register('error', function(resp /*, man */){
-      // Do something different if we think that this is a
-      // permissions issue.
-      var perm_flag = 'InsufficientPermissionsException';
-      var token_flag = 'token';
-      if( resp.message() && resp.message().indexOf(perm_flag) !== -1 ){
-        alert('Error: it seems like you do not have permission to ' +
-        'perform that operation. Did you remember to login?');
-      }
-      else if( resp.message() && resp.message().indexOf(token_flag) !== -1 ){
-        alert('Error: it seems like you have a bad token...');
-      }
-      else {
-        console.log('error:', resp, resp.message_type(), resp.message());
-        // // Generic error.
-        // alert('Error (' +
-        // resp.message_type() + '): ' +
-        // resp.message() + '; ' +
-        // 'your operation was likely not performed.');
-      }
-    }, 10);
-
-    // ???
-    manager.register('meta', function(/* resp , man */){
-      console.log('a meta callback?');
+      tvc.gridOptions.data = gridData;
     });
 
-    // Likely result of a new model being built on Minerva.
-    manager.register('rebuild', function(resp /*, man */){
-      // console.log('rebuild callback', resp);
-
-      // Noctua graph.
-      var noctua_graph = model.graph;
-      tvc.$timeout(function() {
-        tvc.clearForm();
-        tvc.graph = new noctua_graph();
-        tvc.graph.load_data_basic(resp.data());
-
-        tvc.modelTitle = null;
-        var annotations = tvc.graph.get_annotations_by_key(annotationTitleKey);
-        if (annotations.length > 0) {
-          tvc.modelTitle = annotations[0].value(); // there should be only one
-        }
-
-        let annotons = GraphModel.graphToAnnotons(tvc.graph);
-        let gridData = GraphModel.annotonsToTable(tvc.graph, annotons);
-        tvc.gridOptions.data = gridData;
-
-        tvc.title = tvc.graph.get_annotations_by_key('title');
-        // tvc.annotations = {};
-        // var annotations = tvc.graph._annotations;
-        // each(annotations, function(annotation){
-        //   // console.log('annotation', annotation);
-        //   tvc.annotations[annotation.key()] = annotation.value();
-        // });
-      }, 0);
-    }, 10);
-
-    manager.get_model(tvc.model_id);
+    graph.initialize();
   }
 
   getTerm(field, term) {
@@ -300,13 +149,17 @@ export default class TVController {
     return result;
   }
 
-  termSelected(field, term) {
+  termSelected(/* field , term */) {
     // console.log('termSelected', field, this.editingModel[field], term);
   }
 
+  loadEditingModel(annoton) {
+    // console.log('loadEditingModel', annoton);
+    this.editingModel = annoton;
+  }
 
   fillModelWithFakeData() {
-    this.editingModel = {
+    this.loadEditingModel({
       GP: {id: 'MGI:MGI:4367793', label: 'Sho2 Mmus'},
 
       MF: {id: 'GO:0045551', label: 'cinnamyl-alcohol dehydrogenase activity'},
@@ -329,7 +182,7 @@ export default class TVController {
         label: 'biological system reconstruction evidence by exper…ence from single species used in manual assertion',
         reference: 'r3',
         with: 'w3'}
-    };
+    });
   }
 
   clearForm() {
@@ -352,81 +205,44 @@ export default class TVController {
   }
 
   saveRow() {
-    const manager = this.manager;
-
-    // let annotonRows = GraphModel.editingModelToTableRows(this.graph, this.editingModel);
-    // console.log('annotonRows', annotonRows);
-    // this.gridOptions.data = this.gridOptions.data.concat(annotonRows);
-    // this.clearForm();
-
-    var reqs = new minerva_requests.request_set(manager.user_token(), local_id);
-
-    if (!this.modelTitle) {
-      const defaultTitle = 'Model involving ' + this.editingModel.GP.label;
-      reqs.add_annotation_to_model(annotationTitleKey, defaultTitle);
-    }
-
-    var tempGPID = reqs.add_individual(this.editingModel.GP.id);
-    var tempMFID = reqs.add_individual(this.editingModel.MF.id);
-    var tempBPID = this.editingModel.BP ?
-                    reqs.add_individual(this.editingModel.BP.id) :
-                    null;
-    var tempCCID = this.editingModel.CC ?
-                    reqs.add_individual(this.editingModel.CC.id) :
-                    null;
-
-    var edgeGPMF = reqs.add_fact([
-      tempMFID,
-      tempGPID,
-      PredicateEnabledBy
-    ]);
-
-    if (this.editingModel.MFe) {
-      var tempEvidenceMGGPID = reqs.add_individual(this.editingModel.MFe.id);
-      reqs.add_annotation_to_fact('evidence', tempEvidenceMGGPID, null, edgeGPMF);
-      reqs.add_annotation_to_individual('source', this.editingModel.MFe.reference, null, tempEvidenceMGGPID);
-      reqs.add_annotation_to_individual('with', this.editingModel.MFe.with, null, tempEvidenceMGGPID);
-    }
-
-    if (tempBPID) {
-      var edgeGPBP = reqs.add_fact([
-        tempMFID,
-        tempBPID,
-        PredicatePartOf
-      ]);
-
-      if (this.editingModel.BPe) {
-        var tempEvidenceBPGPID = reqs.add_individual(this.editingModel.BPe.id);
-        reqs.add_annotation_to_fact('evidence', tempEvidenceBPGPID, null, edgeGPBP);
-        reqs.add_annotation_to_individual('source', this.editingModel.BPe.reference, null, tempEvidenceBPGPID);
-        reqs.add_annotation_to_individual('with', this.editingModel.BPe.with, null, tempEvidenceBPGPID);
-      }
-    }
-
-    if (tempCCID) {
-      var edgeGPCC = reqs.add_fact([
-        tempMFID,
-        tempCCID,
-        PredicateOccursIn
-      ]);
-
-      if (this.editingModel.CCe) {
-        var tempEvidenceCCGPID = reqs.add_individual(this.editingModel.CCe.id);
-        reqs.add_annotation_to_fact('evidence', tempEvidenceCCGPID, null, edgeGPCC);
-        reqs.add_annotation_to_individual('source', this.editingModel.CCe.reference, null, tempEvidenceCCGPID);
-        reqs.add_annotation_to_individual('with', this.editingModel.CCe.with, null, tempEvidenceCCGPID);
-      }
-    }
-
-    reqs.store_model();
-    manager.request_with(reqs, 'create');
+    this.graph.saveEditingModel(this.editingModel);
   }
 
   editRow(row) {
-    console.log('editRow', row);
+    // console.log('editRow', row);
+    this.clearForm();
+    let annoton = {
+      GP: row.original.GP,
+      MF: row.original.MF,
+      MFe: {
+        id: row.original.MFe.evidence.id,
+        label: row.original.MFe.evidence.label,
+        reference: row.original.MFe.reference,
+        with: row.original.MFe.with
+      },
+      BP: row.original.BP,
+      BPe: {
+        id: row.original.BPe.evidence.id,
+        label: row.original.BPe.evidence.label,
+        reference: row.original.BPe.reference,
+        with: row.original.BPe.with
+      },
+      CC: row.original.CC,
+      CCe: {
+        id: row.original.CCe.evidence.id,
+        label: row.original.CCe.evidence.label,
+        reference: row.original.CCe.reference,
+        with: row.original.CCe.with
+      },
+      Annoton: row.Annoton
+    };
+    this.loadEditingModel(annoton);
   }
+
   deleteRow(row) {
-    console.log('deleteRow', row);
+    if (window.confirm('Are you sure you wish to delete this row?')) {
+      this.graph.deleteAnnoton(row.Annoton);
+    }
   }
 }
-TVController.$inject = ['$scope', '$http', '$timeout', 'uiGridTreeViewConstants', 'lookup'];
+TVController.$inject = ['$scope', '$rootScope', '$http', '$timeout', 'uiGridTreeViewConstants', 'graph', 'lookup'];
