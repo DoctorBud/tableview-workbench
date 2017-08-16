@@ -40,6 +40,7 @@ export default class GraphService {
     this.engine = null;
     this.manager = null;
     this.graph = null;
+    this.loggedIn = local_barista_token && (local_barista_token.length > 0);
   }
 
   initialize() {
@@ -454,7 +455,6 @@ export default class GraphService {
 
 
   saveEditingModel(editingModel) {
-    // console.log('saveEditingModel', editingModel);
     const manager = this.manager;
 
     var reqs = new minerva_requests.request_set(manager.user_token(), local_id);
@@ -470,10 +470,10 @@ export default class GraphService {
 
     var tempGPID = reqs.add_individual(editingModel.GP.id);
     var tempMFID = reqs.add_individual(editingModel.MF.id);
-    var tempBPID = editingModel.BP ?
+    var tempBPID = (editingModel.BP && editingModel.BP.id) ?
                     reqs.add_individual(editingModel.BP.id) :
                     null;
-    var tempCCID = editingModel.CC ?
+    var tempCCID = (editingModel.CC && editingModel.CC.id) ?
                     reqs.add_individual(editingModel.CC.id) :
                     null;
 

@@ -15,7 +15,9 @@ export default class TVController {
     tvc.graph = graph;
 
     var userNameInfo = document.getElementById('user_name_info');
-    userNameInfo.innerHTML = '';
+    if (userNameInfo) {
+      userNameInfo.innerHTML = '';
+    }
 
     tvc.clearForm();
 
@@ -103,6 +105,7 @@ export default class TVController {
         originalName: 'Reference',
         displayName: 'Reference',
         minWidth: 100,
+        maxWidth: 140,
         enableCellEdit: false,
         enableCellEditOnFocus: false,
         cellTemplate: 'cellTemplate.html'
@@ -113,6 +116,7 @@ export default class TVController {
         originalName: 'With',
         displayName: 'With',
         minWidth: 100,
+        maxWidth: 140,
         enableCellEdit: false,
         enableCellEditOnFocus: false,
         cellTemplate: 'cellTemplate.html'
@@ -209,33 +213,47 @@ export default class TVController {
   }
 
   editRow(row) {
-    // console.log('editRow', row);
     this.clearForm();
     let annoton = {
       GP: row.original.GP,
       MF: row.original.MF,
-      MFe: {
+      Annoton: row.Annoton
+    };
+
+    if (row.original.MFe) {
+      annoton.MFe = {
         id: row.original.MFe.evidence.id,
         label: row.original.MFe.evidence.label,
         reference: row.original.MFe.reference,
         with: row.original.MFe.with
-      },
-      BP: row.original.BP,
-      BPe: {
-        id: row.original.BPe.evidence.id,
-        label: row.original.BPe.evidence.label,
-        reference: row.original.BPe.reference,
-        with: row.original.BPe.with
-      },
-      CC: row.original.CC,
-      CCe: {
-        id: row.original.CCe.evidence.id,
-        label: row.original.CCe.evidence.label,
-        reference: row.original.CCe.reference,
-        with: row.original.CCe.with
-      },
-      Annoton: row.Annoton
-    };
+      };
+    }
+
+    if (row.original.BP) {
+      annoton.BP = row.original.BP;
+
+      if (row.original.BPe) {
+        annoton.BPe = {
+          id: row.original.BPe.evidence.id,
+          label: row.original.BPe.evidence.label,
+          reference: row.original.BPe.reference,
+          with: row.original.BPe.with
+        };
+      }
+    }
+
+    if (row.original.CC) {
+      annoton.CC = row.original.CC;
+
+      if (row.original.CCe) {
+        annoton.CCe = {
+          id: row.original.CCe.evidence.id,
+          label: row.original.CCe.evidence.label,
+          reference: row.original.CCe.reference,
+          with: row.original.CCe.with
+        };
+      }
+    }
     this.loadEditingModel(annoton);
   }
 

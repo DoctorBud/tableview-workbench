@@ -49,6 +49,7 @@
   },
   "homepage": "https://github.com/DoctorBud/tableview-workbench#readme",
   "devDependencies": {
+    "autoprefixer": "^7.1.2",
     "babel-core": "^6.25.0",
     "babel-eslint": "^7.2.3",
     "babel-loader": "^7.1.1",
