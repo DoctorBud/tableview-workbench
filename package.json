@@ -81,6 +81,7 @@
     "angular": "^1.6.5",
     "angular-ui-bootstrap": "^2.5.0",
     "angular-ui-grid": "^4.0.6",
+    "autoprefixer": "7.1.2",
     "bbop": "^2.4.3",
     "bbop-client-barista": "0.0.7",
     "bbop-core": "0.0.5",
