@@ -1,7 +1,7 @@
-menu-name: "Simple Annoton Editor"
-page-name: "Simple Annoton Editor"
+menu-name: "Simple annoton editor"
+page-name: "Simple annoton editor v0.0.5"
 type: "model"
-help-link: "http://github.com/geneontology/noctua/issues"
+help-link: "http://github.com/DoctorBud/tableview-workbench/issues"
 javascript:
   - bundle.js
 css: []
