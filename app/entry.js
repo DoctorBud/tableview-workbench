@@ -3,6 +3,8 @@
 // Main program
 // Root of all the imports/requires
 
+window.tableviewWorkbenchVersion = '0.0.7';
+
 import angular from 'angular';
 import 'angular-ui-grid/ui-grid.min.js';
 import nguibootstrap from 'angular-ui-bootstrap';
