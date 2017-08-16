@@ -11,8 +11,8 @@ export default class LookupService {
   }
 
   golrLookup(field, oldValue, val) {
-    /* global global_golr_server */
-    var golrURLBase = `${global_golr_server}/select`;
+    /* global global_golr_neo_server */
+    var golrURLBase = `${global_golr_neo_server}/select`;
 
     var baseRequestParams = {
       defType: 'edismax',
