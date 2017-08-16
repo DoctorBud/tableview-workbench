@@ -7,7 +7,7 @@ A Noctua Workbench to allow entry and viewing of models in a tabular format
 - The workbench fails to load properly when the user is not logged into Noctua.
 - Changes to the model from within Noctua's graph editor are not reflected dynamically in the table view.
 - Edit Annoton does not work yet
-- Delete Annoton does not work yet
+- Delete Annoton on the last annoton will produce a Minerva error that inhibits the refresh of the UI; however, the deletion will occur. The salient error from Minerva is 'The model has no individuals. Empty models should not be saved'.
 
 
 ### How to Build

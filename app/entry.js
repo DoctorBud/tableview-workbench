@@ -4,7 +4,7 @@
 // Root of all the imports/requires
 
 import angular from 'angular';
-import ngGrid from 'angular-ui-grid/ui-grid.min.js';
+import 'angular-ui-grid/ui-grid.min.js';
 import nguibootstrap from 'angular-ui-bootstrap';
 import 'jsonformatter';
 import 'jsonformatter/dist/json-formatter.min.css';
@@ -28,5 +28,7 @@ app.config(['JSONFormatterConfigProvider', function (JSONFormatterConfigProvider
 import TVController from 'TVController';
 app.controller('TVController', TVController);
 
-import LookupService from './lookup.js';
+import GraphService from './graph.service.js';
+app.service('graph', GraphService);
+import LookupService from './lookup.service.js';
 app.service('lookup', LookupService);
