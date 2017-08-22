@@ -40,6 +40,7 @@
               <i class="fa fa-spinner fa-spin fa-fw"></i>
             </div>
             <input
+              id="GPFocus"
               aria-describedby="igGP"
               type="text"
               ng-model="tvc.editingModel.GP"
@@ -157,6 +158,7 @@
         <div class="input-group input-group-sm">
           <span class="input-group-addon" id="ig{{term}}eReference">Reference</span>
           <input
+            ng-disabled="!tvc.editingModel[term + 'e']"
             ng-model="tvc.editingModel[term + 'e'].reference"
             type="text"
             class="form-control"
@@ -169,6 +171,7 @@
         <div class="input-group input-group-sm">
           <span class="input-group-addon" id="ig{{term}}eWith">With</span>
           <input
+            ng-disabled="!tvc.editingModel[term + 'e']"
             ng-model="tvc.editingModel[term + 'e'].with"
             type="text"
             class="form-control"
@@ -186,11 +189,21 @@
       <div class="col-xs-12">
         <button
           type="button"
-          ng-disabled="!tvc.saveRowEnabled()"
+          ng-disabled="!tvc.saveRowEnabled().result"
           ng-click="tvc.saveRow()"
           class="btn btn-primary btn-sm center-block xbtn-block">
           Save Annoton
         </button>
+      </div>
+    </div>
+
+    <div
+      ng-if="!tvc.saveRowEnabled().result"
+      class="row">
+      <div class="col-xs-12">
+        <h6 ng-repeat="reason in tvc.saveRowEnabled().reasons" style="color:red;">
+          {{reason}}
+        </h6>
       </div>
     </div>
 

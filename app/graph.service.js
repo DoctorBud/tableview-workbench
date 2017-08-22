@@ -24,8 +24,8 @@ var local_collapsible_relations = typeof global_collapsible_relations !== 'undef
 const PredicateEnabledBy = 'RO:0002333';
 const PredicatePartOf = 'BFO:0000050';
 const PredicateOccursIn = 'BFO:0000066';
-
-
+const rootMF = 'GO:0003674';
+const noDataECO = 'ECO:0000035';
 
 export default class GraphService {
   constructor($rootScope, $timeout) {
@@ -100,12 +100,10 @@ export default class GraphService {
 
     // ???
     manager.register('meta', function(/* resp , man */){
-      console.log('a meta callback?');
+      console.log('## a meta callback?');
     });
 
-    // Likely result of a new model being built on Minerva.
-    manager.register('rebuild', function(resp /*, man */){
-      // Noctua graph.
+    function rebuild(resp) {
       var noctua_graph = model.graph;
       that.graph = new noctua_graph();
       that.graph.load_data_basic(resp.data());
@@ -126,18 +124,18 @@ export default class GraphService {
           gridData: gridData
         });
       }, 10);
-    }, 10);
+    }
+
+    manager.register('merge', function(resp) {
+        manager.get_model(that.model_id);
+      });
+    manager.register('rebuild', function(resp) {
+        rebuild(resp);
+      }, 10);
 
     manager.get_model(this.model_id);
   }
 
-
-
-
-
-
-  // Noctua-specific
-  // var model = require('bbop-graph-noctua');
 
   getNodeLabel(node) {
     var label = '';
@@ -181,14 +179,7 @@ export default class GraphService {
   }
 
   edgeToEvidence(graph, edge) {
-    var result = {
-      evidence: {
-        id: null,
-        label: ''
-      },
-      reference: '',
-      with: ''
-    };
+    var result = null;
 
     // console.log('edgeToEvidence', edge);
     var evidenceAnnotations = edge.get_annotations_by_key('evidence');
@@ -198,9 +189,14 @@ export default class GraphService {
       if (firstAnnotationNode) {
         // console.log('...firstAnnotationId', firstAnnotationId);
         // console.log('...firstAnnotationNode', firstAnnotationNode);
-        result.evidence.id = this.getNodeId(firstAnnotationNode);
-        result.evidence.label = this.getNodeLabel(firstAnnotationNode);
-        // console.log('...firstAnnotationNode result.evidence', result.evidence);
+        result = {
+          evidence: {
+            id: this.getNodeId(firstAnnotationNode),
+            label: this.getNodeLabel(firstAnnotationNode)
+          },
+          reference: '',
+          with: ''
+        };
 
         let sources = firstAnnotationNode.get_annotations_by_key('source');
         let withs = firstAnnotationNode.get_annotations_by_key('with');
@@ -302,60 +298,65 @@ export default class GraphService {
     let summaryReference = '';
     let summaryWith = '';
 
-    result.push({
-        Aspect: 'F',
-        Term: mfLabel,
-        Evidence: annoton.MFe.evidence,
-        Reference: annoton.MFe.reference,
-        With: annoton.MFe.with,
-        $$treeLevel: 1
-    });
-
+    let mfRow = {
+      Aspect: 'F',
+      Term: mfLabel,
+      $$treeLevel: 1
+    };
     summaryAspect += 'F';
     summaryTerm += '• ' + mfLabel;
 
-    if (annoton.MFe.evidence.id) {
+    if (annoton.MFe) {
+      mfRow.Evidence = annoton.MFe.evidence;
+      mfRow.Reference = annoton.MFe.reference;
+      mfRow.With = annoton.MFe.with;
+
       summaryEvidence += '• ' + annoton.MFe.evidence.label;
       summaryReference += '• ' + annoton.MFe.reference;
       summaryWith += '• ' + annoton.MFe.with;
     }
+    result.push(mfRow);
 
     if (bp) {
-      result.push({
+      let bpRow = {
           Aspect: 'P',
           Term: bpLabel,
-          Evidence: annoton.BPe.evidence.label,
-          Reference: annoton.BPe.reference,
-          With: annoton.BPe.with,
           $$treeLevel: 1
-      });
+      };
 
       summaryAspect += 'P';
       summaryTerm += '\n• ' + bpLabel;
-      if (annoton.BPe.evidence.id) {
+      if (annoton.BPe) {
+        bpRow.Evidence = annoton.BPe.evidence;
+        bpRow.Reference = annoton.BPe.reference;
+        bpRow.With = annoton.BPe.with;
+
         summaryEvidence += '\n• ' + annoton.BPe.evidence.label;
         summaryReference += '\n• ' + annoton.BPe.reference;
         summaryWith += '\n• ' + annoton.BPe.with;
       }
+      result.push(bpRow);
     }
 
     if (cc) {
-      result.push({
+      let ccRow = {
           Aspect: 'C',
           Term: ccLabel,
-          Evidence: annoton.CCe.evidence,
-          Reference: annoton.CCe.reference,
-          With: annoton.CCe.with,
           $$treeLevel: 1
-      });
+      };
 
       summaryAspect += 'C';
       summaryTerm += '\n• ' + ccLabel;
-      if (annoton.CCe.evidence.id) {
+      if (annoton.CCe) {
+        ccRow.Evidence = annoton.CCe.evidence;
+        ccRow.Reference = annoton.CCe.reference;
+        ccRow.With = annoton.CCe.with;
+
         summaryEvidence += '\n• ' + annoton.CCe.evidence.label;
         summaryReference += '\n• ' + annoton.CCe.reference;
         summaryWith += '\n• ' + annoton.CCe.with;
       }
+      result.push(ccRow);
     }
 
     result.unshift({
@@ -369,11 +370,11 @@ export default class GraphService {
         With: summaryWith,
         original: {
           GP: {id: gpID, label: gpLabel},
-          MF: {id: mfID, label: mfLabel},
+          MF: mf ? {id: mfID, label: mfLabel} : null,
           MFe: annoton.MFe,
-          BP: {id: bpID, label: bpLabel},
+          BP: bp ? {id: bpID, label: bpLabel} : null,
           BPe: annoton.BPe,
-          CC: {id: ccID, label: ccLabel},
+          CC: cc ? {id: ccID, label: ccLabel} : null,
           CCe: annoton.CCe
         },
         Annoton: annoton,
@@ -455,6 +456,7 @@ export default class GraphService {
 
 
   saveEditingModel(editingModel) {
+    // console.log('saveEditingModel', editingModel, editingModel.Annoton)
     const manager = this.manager;
 
     var reqs = new minerva_requests.request_set(manager.user_token(), local_id);
@@ -469,25 +471,41 @@ export default class GraphService {
     }
 
     var tempGPID = reqs.add_individual(editingModel.GP.id);
-    var tempMFID = reqs.add_individual(editingModel.MF.id);
-    var tempBPID = (editingModel.BP && editingModel.BP.id) ?
+    var tempMFID = editingModel.MF ?
+                    reqs.add_individual(editingModel.MF.id) :
+                    null;
+    var tempBPID = editingModel.BP ?
                     reqs.add_individual(editingModel.BP.id) :
                     null;
-    var tempCCID = (editingModel.CC && editingModel.CC.id) ?
+    var tempCCID = editingModel.CC ?
                     reqs.add_individual(editingModel.CC.id) :
                     null;
 
-    var edgeGPMF = reqs.add_fact([
-      tempMFID,
-      tempGPID,
-      PredicateEnabledBy
-    ]);
+    let MFe = editingModel.MFe;
+    if (!tempMFID) {
+      tempMFID = reqs.add_individual(rootMF);
+      MFe = {
+        id: noDataECO
+      };
+    }
 
-    if (editingModel.MFe) {
-      var tempEvidenceMGGPID = reqs.add_individual(editingModel.MFe.id);
-      reqs.add_annotation_to_fact('evidence', tempEvidenceMGGPID, null, edgeGPMF);
-      reqs.add_annotation_to_individual('source', editingModel.MFe.reference, null, tempEvidenceMGGPID);
-      reqs.add_annotation_to_individual('with', editingModel.MFe.with, null, tempEvidenceMGGPID);
+    if (tempMFID) {
+      var edgeGPMF = reqs.add_fact([
+        tempMFID,
+        tempGPID,
+        PredicateEnabledBy
+      ]);
+
+      if (MFe) {
+        var tempEvidenceMGGPID = reqs.add_individual(MFe.id);
+        reqs.add_annotation_to_fact('evidence', tempEvidenceMGGPID, null, edgeGPMF);
+        if (MFe.reference) {
+          reqs.add_annotation_to_individual('source', MFe.reference, null, tempEvidenceMGGPID);
+        }
+        if (MFe.with) {
+          reqs.add_annotation_to_individual('with', MFe.with, null, tempEvidenceMGGPID);
+        }
+      }
     }
 
     if (tempBPID) {
@@ -500,8 +518,12 @@ export default class GraphService {
       if (editingModel.BPe) {
         var tempEvidenceBPGPID = reqs.add_individual(editingModel.BPe.id);
         reqs.add_annotation_to_fact('evidence', tempEvidenceBPGPID, null, edgeGPBP);
-        reqs.add_annotation_to_individual('source', editingModel.BPe.reference, null, tempEvidenceBPGPID);
-        reqs.add_annotation_to_individual('with', editingModel.BPe.with, null, tempEvidenceBPGPID);
+        if (editingModel.BPe.reference) {
+          reqs.add_annotation_to_individual('source', editingModel.BPe.reference, null, tempEvidenceBPGPID);
+        }
+        if (editingModel.BPe.with) {
+          reqs.add_annotation_to_individual('with', editingModel.BPe.with, null, tempEvidenceBPGPID);
+        }
       }
     }
 
@@ -515,18 +537,25 @@ export default class GraphService {
       if (editingModel.CCe) {
         var tempEvidenceCCGPID = reqs.add_individual(editingModel.CCe.id);
         reqs.add_annotation_to_fact('evidence', tempEvidenceCCGPID, null, edgeGPCC);
-        reqs.add_annotation_to_individual('source', editingModel.CCe.reference, null, tempEvidenceCCGPID);
-        reqs.add_annotation_to_individual('with', editingModel.CCe.with, null, tempEvidenceCCGPID);
+        if (editingModel.CCe.reference) {
+          reqs.add_annotation_to_individual('source', editingModel.CCe.reference, null, tempEvidenceCCGPID);
+        }
+        if (editingModel.CCe.with) {
+          reqs.add_annotation_to_individual('with', editingModel.CCe.with, null, tempEvidenceCCGPID);
+        }
       }
     }
 
-    reqs.store_model();
+    // console.log('saveEditingModel', editingModel, reqs);
+    // reqs.store_model();
     manager.request_with(reqs);
   }
 
   addDeletionToRequestSet(reqs, annoton) {
     reqs.remove_individual(annoton.GP);
-    reqs.remove_individual(annoton.MF);
+    if (annoton.MF) {
+      reqs.remove_individual(annoton.MF);
+    }
     if (annoton.BP) {
       reqs.remove_individual(annoton.BP);
     }
@@ -536,10 +565,9 @@ export default class GraphService {
   }
 
   deleteAnnoton(annoton) {
-    console.log('deleteAnnoton', annoton);
     const reqs = new minerva_requests.request_set(this.manager.user_token(), local_id);
     this.addDeletionToRequestSet(reqs, annoton);
-    reqs.store_model(local_id);
+    // reqs.store_model(local_id);
     this.manager.request_with(reqs);
   }
 }
