@@ -199,18 +199,72 @@ export default class TVController {
       CC: null,
       CCe: null
     };
+
+    this.$timeout(() => {
+      const element = angular.element("#GPFocus");
+      element.focus()
+    });
   }
 
   saveRowEnabled() {
-    return  this.editingModel &&
-            this.editingModel.GP &&
-            this.editingModel.MF &&
-            this.editingModel.MFe;
+    let result = this.editingModel && this.editingModel.GP;
+    let reasons = [];
+
+    if (!result) {
+      reasons.push('A GP is required');
+    }
+    else {
+      let hasAtLeastOneElement = false;
+
+      if (result && this.editingModel.MF) {
+        if (!this.editingModel.MFe) {
+          result = false;
+          reasons.push('Missing MFe');
+        }
+        else {
+          hasAtLeastOneElement = true;
+        }
+      }
+
+
+      if (result && this.editingModel.BP) {
+        if (!this.editingModel.BPe) {
+          result = false;
+          reasons.push('Missing BPe');
+        }
+        else {
+          hasAtLeastOneElement = true;
+        }
+      }
+
+      if (result && this.editingModel.CC) {
+        if (!this.editingModel.CCe) {
+          result = false;
+          reasons.push('Missing CCe');
+        }
+        else {
+          hasAtLeastOneElement = true;
+        }
+      }
+
+      if (!hasAtLeastOneElement) {
+        result = false;
+        reasons.push('At least one Aspect required.');
+      }
+    }
+
+    // console.log('saveRowEnabled', this.editingModel, result);
+    return {
+      result: result,
+      reasons: reasons
+    }
   }
+
 
   saveRow() {
     this.graph.saveEditingModel(this.editingModel);
   }
+
 
   editRow(row) {
     this.clearForm();
@@ -254,6 +308,8 @@ export default class TVController {
         };
       }
     }
+
+    // console.log('row.original', row.original, annoton);
     this.loadEditingModel(annoton);
   }
 
