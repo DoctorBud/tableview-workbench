@@ -3,7 +3,7 @@
 // Main program
 // Root of all the imports/requires
 
-window.tableviewWorkbenchVersion = '0.0.8';
+window.tableviewWorkbenchVersion = '0.0.9';
 
 import angular from 'angular';
 import 'angular-ui-grid/ui-grid.min.js';

@@ -7,23 +7,13 @@
 
   <div
     ng-controller="TVController as tvc"
+    ng-form="patternForm"
     class="container-fluid tv-container">
 
-    <br>
     <div
       class="row">
-      <div class="col-xs-9 text-center">
-        <h5>{{tvc.graph.title[0].value()}} ({{tvc.graph.model_id}})</h5>
-      </div>
-      <div
-        ng-if="false"
-        class="col-xs-3">
-        <button
-          type="button"
-          ng-click="tvc.fillModelWithFakeData()"
-          class="btn btn-sm btn-primary xbtn-block">
-          Simulated Data
-        </button>
+      <div class="col-xs-12 text-center">
+        <h4>{{tvc.graph.title[0].value()}} ({{tvc.graph.model_id}})</h4>
       </div>
     </div>
 
@@ -158,12 +148,18 @@
         <div class="input-group input-group-sm">
           <span class="input-group-addon" id="ig{{term}}eReference">Reference</span>
           <input
+            name="reference{{term}}"
+            ng-pattern="/^.+:.+$/"
             ng-disabled="!tvc.editingModel[term + 'e']"
             ng-model="tvc.editingModel[term + 'e'].reference"
             type="text"
             class="form-control"
             placeholder="PMID:1234"
             aria-describedby="ig{{term}}eReference">
+          <div class="no-results"
+            ng-show="patternForm.reference{{term}}.$error.pattern">
+            Please use CURIE format.
+          </div>
         </div>
       </div>
 
@@ -171,39 +167,50 @@
         <div class="input-group input-group-sm">
           <span class="input-group-addon" id="ig{{term}}eWith">With</span>
           <input
+            name="with{{term}}"
+            ng-pattern="/^.+:.+$/"
             ng-disabled="!tvc.editingModel[term + 'e']"
             ng-model="tvc.editingModel[term + 'e'].with"
             type="text"
             class="form-control"
             placeholder="PMID:5678"
             aria-describedby="ig{{term}}eWith">
+          <div class="no-results"
+            ng-show="patternForm.with{{term}}.$error.pattern">
+            Please use CURIE format.
+          </div>
         </div>
       </div>
 
     </div>
 
+    <br>
     <div
       ng-if="tvc.graph.loggedIn"
-      class="row"
-      style="margin-top:10px;">
-      <div class="col-xs-12">
+      class="row">
+      <div class="col-xs-8">
+        <div
+          ng-if="tvc.saveRowEnabled(patternForm).length > 0"
+          class="well well-sm"
+          style="margin:0;padding:3px;">
+          <ul>
+            <li
+              ng-repeat="reason in tvc.saveRowEnabled(patternForm)"class="error-reason">
+              {{reason}}
+            </li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="col-xs-3">
         <button
           type="button"
-          ng-disabled="!tvc.saveRowEnabled().result"
+          ng-disabled="tvc.saveRowEnabled(patternForm).length > 0"
           ng-click="tvc.saveRow()"
-          class="btn btn-primary btn-sm center-block xbtn-block">
+          class="btn btn-primary btn-sm center-block btn-block"
+          style="margin-top:3px;">
           Save Annoton
         </button>
-      </div>
-    </div>
-
-    <div
-      ng-if="!tvc.saveRowEnabled().result"
-      class="row">
-      <div class="col-xs-12">
-        <h6 ng-repeat="reason in tvc.saveRowEnabled().reasons" style="color:red;">
-          {{reason}}
-        </h6>
       </div>
     </div>
 
