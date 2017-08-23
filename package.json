@@ -1,6 +1,6 @@
 {
   "name": "tableview-workbench",
-  "version": "0.0.8",
+  "version": "0.0.9",
   "description": "A Noctua workbench (type='model') enabling viewing and editing models in a tabular format",
   "main": "index.js",
   "scripts": {

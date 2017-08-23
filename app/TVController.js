@@ -3,6 +3,7 @@
 //  Primary controller driving the table-mode
 //
 
+/* global angular */
 
 export default class TVController {
   constructor($scope, $rootScope, $http, $timeout, uiGridTreeViewConstants, graph, lookup) {
@@ -201,63 +202,74 @@ export default class TVController {
     };
 
     this.$timeout(() => {
-      const element = angular.element("#GPFocus");
-      element.focus()
+      const element = angular.element('#GPFocus');
+      element.focus();
     });
   }
 
-  saveRowEnabled() {
-    let result = this.editingModel && this.editingModel.GP;
+  saveRowEnabled(patternForm) {
     let reasons = [];
 
-    if (!result) {
-      reasons.push('A GP is required');
-    }
-    else {
+    if (this.editingModel) {
+      if (!this.editingModel.GP) {
+        reasons.push('Select a Gene Product (GP)');
+      }
+
       let hasAtLeastOneElement = false;
 
-      if (result && this.editingModel.MF) {
+      if (reasons.length === 0 && this.editingModel.MF) {
         if (!this.editingModel.MFe) {
-          result = false;
-          reasons.push('Missing MFe');
+          reasons.push('Select Evidence for the MF.');
         }
         else {
           hasAtLeastOneElement = true;
         }
       }
 
-
-      if (result && this.editingModel.BP) {
+      if (reasons.length === 0 && this.editingModel.BP) {
         if (!this.editingModel.BPe) {
-          result = false;
-          reasons.push('Missing BPe');
+          reasons.push('Select Evidence for the BP');
         }
         else {
           hasAtLeastOneElement = true;
         }
       }
 
-      if (result && this.editingModel.CC) {
+      if (reasons.length === 0 && this.editingModel.CC) {
         if (!this.editingModel.CCe) {
-          result = false;
-          reasons.push('Missing CCe');
+          reasons.push('Select Evidence for the CC');
         }
         else {
           hasAtLeastOneElement = true;
         }
       }
 
-      if (!hasAtLeastOneElement) {
-        result = false;
+      if (reasons.length === 0 && !hasAtLeastOneElement) {
         reasons.push('At least one Aspect required.');
       }
+
+      if (reasons.length === 0 && patternForm.referenceMF.$error.pattern) {
+        reasons.push('Please use CURIE format for MF Reference.');
+      }
+      if (reasons.length === 0 && patternForm.referenceBP.$error.pattern) {
+        reasons.push('Please use CURIE format for BP Reference.');
+      }
+      if (reasons.length === 0 && patternForm.referenceCC.$error.pattern) {
+        reasons.push('Please use CURIE format for CC Reference.');
+      }
+      if (reasons.length === 0 && patternForm.withMF.$error.pattern) {
+        reasons.push('Please use CURIE format for MF With.');
+      }
+      if (reasons.length === 0 && patternForm.withBP.$error.pattern) {
+        reasons.push('Please use CURIE format for BP With.');
+      }
+      if (reasons.length === 0 && patternForm.withCC.$error.pattern) {
+        reasons.push('Please use CURIE format for CC With.');
+      }
     }
 
-    // console.log('saveRowEnabled', this.editingModel, result);
-    return {
-      result: result,
-      reasons: reasons
-    }
+    // console.log('saveRowEnabled', this.editingModel, reasons);
+    return reasons;
   }
 
 
